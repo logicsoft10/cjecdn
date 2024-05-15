@@ -1,0 +1,91 @@
+///////////////////////////
+// Source : cjecdn.qc.ca //
+///////////////////////////
+
+/////////////////////////////////////////////////////////////////////////////////////////
+function envoyerEmailSiDateCorrespondanteMoinsUnJour() {
+  // Récupérer la feuille de calcul active
+  var feuille = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("calendrier");
+  
+  // Récupérer les données dans le tableau
+  var plageData = feuille.getRange("B3:G" + feuille.getLastRow()).getValues(); //+ 
+  
+  // liste des destinataires de l'email de rappel
+  var destinataires = [
+    'christian.melong@gmail.com',
+    'baaklini@cjecdn.qc.ca',
+    'sophialalanne@yahoo.com',
+    'adagi.cje@gmail.com',
+    'alfalloujialiaa@gmail.com',
+    'allanramal.ssj@gmail.com',
+    'baccar.houssam@gmail.com',
+    'cecile.cjecdn@gmail.com',
+    'glenisson.alice@gmail.com',
+    'haya.cje@gmail.com',
+    'irisk.ssj@gmail.com',
+    'melgahungu@gmail.com',
+    'rafikyassia.cje@gmail.com',
+    'yhales2019@gmail.com',
+    'topitzu@gmail.com',
+    'marc.cjecdn@gmail.com'
+  ];
+  // Récupérer la date du jour 
+  var date = new Date();
+  var annee = date.getFullYear();
+  var mois = ('0' + (date.getMonth() + 1)).slice(-2); // Ajoute un zéro en tête si nécessaire
+  var jour = ('0' + date.getDate()).slice(-2); // Ajoute un zéro en tête si nécessaire
+  var dateAujourdhui = annee + '/' + mois + '/' + jour;
+  //var dateAujourdhuiMoinsUnJour = new Date();
+  //dateAujourdhuiMoinsUnJour.setDate(dateAujourdhuiMoinsUnJour.getDate() - 1);
+  
+  // Boucler à travers les dates et envoyer un e-mail si la condition est remplie
+  for (var i = 0; i < plageData.length; i++) {
+    var data = plageData[i];
+    var debut = data[0];
+    var an = debut.getFullYear();
+    var month = ('0' + (debut.getMonth() + 1)).slice(-2); 
+    var dayBefore = ('0' + (debut.getDate() - 1)).slice(-2); 
+    var day = ('0' + debut.getDate()).slice(-2);
+    var dateDebut = an + '/' + month + '/' + dayBefore;
+    var debutEvent = an + '/' + month + '/' + day;
+    var fin = data[1];
+    var ans = fin.getFullYear();
+    var months = ('0' + (fin.getMonth() + 1)).slice(-2); 
+    var days = ('0' + fin.getDate()).slice(-2);
+    var dateFin = ans + '/' + months + '/' + days;
+    var titre = data[2];
+    var lieu = data[3];
+    var organisateur = data[4];
+    var responsable = data[5];
+
+    // Comparer la date de début avec la date d'aujourd'hui moins un jour
+    if (dateDebut == dateAujourdhui) {
+      var sujetEmail = "Calendrier CJECDN 2024: rappel de l'événement "+ titre + " aura lieu demain";
+      var corpsEmail = "Titre de l'événement : "+ titre + "\nDate de début : " + debutEvent + "\nDate de fin : " + dateFin + "\nAdresse : "+ lieu + "\nOrganisateur : "+ organisateur + "\nResponsable : " + responsable;
+      
+      // Remplacez 'destinataire@example.com' par l'adresse e-mail à laquelle vous souhaitez envoyer le message
+      MailApp.sendEmail({
+        to: destinataires.join(','),
+        subject: sujetEmail,
+        body: corpsEmail
+      });
+    }
+  }
+}
+
+// Fonction déclenchée quotidiennement à 9h
+function planifierTacheQuotidienne() {
+  // Définir l'heure d'exécution (9h du matin)
+  var heureExecution = new Date();
+  heureExecution.setHours(9);
+  heureExecution.setMinutes(0);
+  
+  // Créer un déclencheur pour exécuter la fonction envoyerEmailSiDateCorrespondanteMoinsUnJour tous les jours à 9h
+  ScriptApp.newTrigger('envoyerEmailSiDateCorrespondanteMoinsUnJour')
+    .timeBased()
+    .at(heureExecution)
+    .create();
+}
+
+
+
